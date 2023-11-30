@@ -1,0 +1,3 @@
+[submodule "ntzfind"]
+	path = ntzfind
+	url = git@github.com:rokicki/ntzfind.git
