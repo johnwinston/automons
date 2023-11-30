@@ -1,5 +1,6 @@
-from auto_ntzfind import AUTO_NTZFIND
-from rle2apgcode import RLE2APGCODE
+from src.auto_ntzfind import AUTO_NTZFIND
+from src.rle2apgcode import RLE2APGCODE
+from submodules import lifelib
 
 def main():
     user_input = input('Run auto-ntzfind? (y/n): ')
@@ -9,7 +10,7 @@ def main():
 
     user_input = input('Run rle2apgcode? (y/n): ')
     if user_input.lower() == 'y':
-        RLE2APGCODE().run()
+        RLE2APGCODE(lifelib).run()
 
 if __name__ == '__main__':
     main()

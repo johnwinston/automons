@@ -1,5 +1,4 @@
 import os
-import lifelib
 import re
 import qrcode
 import json
@@ -13,10 +12,11 @@ def random_color():
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 class RLE2APGCODE:
-    def __init__(self):
+    def __init__(self,lifelib):
         self.rlePath = '/home/winston/devel/play/golly-4.2-src/Scripts/Python/rles'
         self.catagolueURL = 'https://catagolue.hatsya.com/object/'
         self.patterns = {}
+        self.lifelib=lifelib
 
     def returnNode(self):
         return {
@@ -37,7 +37,7 @@ class RLE2APGCODE:
                     match = re.search(r'rule = ([^ \n]+)', rle)
                     if match:
                         rule = match.group(1).lower().replace('/','')
-                    lt = lifelib.load_rules(rule).lifetree(n_layers=1)
+                    lt = self.lifelib.load_rules(rule).lifetree(n_layers=1)
                     pattern = lt.pattern(rle)
                     apgcode = pattern.apgcode
                     gif = pattern.make_gif(hue=random_color())

@@ -41,7 +41,7 @@ class AUTO_NTZFIND:
         output = []
 
         process = Popen(
-                    ["./ntzfind/ntzfind", rule, "w6", self.period, "k1", "v", "l200"],
+                    ["./submodules/ntzfind/ntzfind", rule, "w6", self.period, "k1", "v", "l200"],
                     shell=False,
                     stdout=PIPE
                     )
