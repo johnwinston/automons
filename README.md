@@ -1,7 +1,7 @@
 ./src/auto-ntzfind.py
     -- creates Life 1.05 files in golly folder
 
-automons.py
+./src/automons.py
     -- run in golly to create rles of Life 1.05 files
 
 ./src/rle2apgcode.py
