@@ -1,0 +1,6 @@
+[submodule "automons/ntzfind"]
+	path = automons/ntzfind
+	url = git@github.com:rokicki/ntzfind.git
+[submodule "automons/lifelib"]
+	path = automons/lifelib
+	url = https://gitlab.com/apgoucher/lifelib.git

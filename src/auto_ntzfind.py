@@ -3,8 +3,7 @@ import numpy as np
 from subprocess import PIPE, Popen
 from random import randrange, sample
 
-class Auto_NTZfind:
-
+class AUTO_NTZFIND:
     def __init__(self, iterations, period):
         self.golly_file_path =\
             "/home/winston/devel/play/golly-4.2-src/Scripts/Python/ntzfind_patterns/"
@@ -60,8 +59,7 @@ class Auto_NTZfind:
                 break
             elif 'Spaceship found' in str(output[i]):
                 with open(
-                    #self.golly_file_path+"pattern"+str(iteration+1)+".lif",
-                    "pattern"+str(iteration+1)+".lif",
+                    self.golly_file_path+"pattern"+str(iteration+1)+".lif",
                     'w'
                     ) as file:
 
