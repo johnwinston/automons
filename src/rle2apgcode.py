@@ -41,8 +41,8 @@ class RLE2APGCODE:
 
     def make_gif_and_qr(self, pattern, apgcode, rule, url):
         gif = pattern.make_gif(
-                filename='./gifs/'+apgcode+'_'+str(rule)+'.gif',
-                hue=random_color()
+                hue=random_color(),
+                filename='./gifs/'+apgcode+'.gif'
                 )
 
         qr = qrcode.QRCode(
@@ -79,5 +79,7 @@ class RLE2APGCODE:
 
             self.make_gif_and_qr(pattern, apgcode, rule, self.patterns[filename]["url"])
 
-        with open('patterns.json', 'w') as json_file:
+        with open('./data/patterns.json', 'w') as json_file:
             json.dump(self.patterns, json_file, indent=4)
+
+        return self.patterns

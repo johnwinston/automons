@@ -1,6 +1,6 @@
 import os
 
-class Cleanup:
+class CLEANUP:
     def __init__(self):
         self.base_path = '/home/winston/devel/play/golly-4.2-src/Scripts/Python/'
         self.rle_path = self.base_path + 'rles/'
