@@ -14,6 +14,7 @@ def random_color():
 class RLE2APGCODE:
     def __init__(self,lifelib):
         self.rle_path = '/home/winston/devel/play/golly-4.2-src/Scripts/Python/rles'
+        self.pythlib_path = './submodules/lifelib/pythlib/'
         self.catagolue_URL = 'https://catagolue.hatsya.com/object/'
         self.patterns = {}
         self.lifelib=lifelib
@@ -57,10 +58,15 @@ class RLE2APGCODE:
         img = img.resize((450,450))
         img.save('./qrs/' + apgcode + '.png')
 
+    def cleanup_shared_objects(self):
+        for filename in os.listdir(self.pythlib_path):
+            if filename.endswith(".so"):
+                os.remove(os.path.join(self.pythlib_path, filename))
+
     def run(self):
         if len(os.listdir(self.rle_path)) == 0:
-            print("No rle files found")
-            return
+            print("No rle files found. Run automons.py in Golly")
+            return False
 
         for filename in os.listdir(self.rle_path):
             self.patterns[filename] = self.return_node()
@@ -78,6 +84,7 @@ class RLE2APGCODE:
             self.patterns[filename]["url"] = self.catagolue_URL + apgcode + '/' + rule
 
             self.make_gif_and_qr(pattern, apgcode, rule, self.patterns[filename]["url"])
+            self.cleanup_shared_objects()
 
         with open('./data/patterns.json', 'w') as json_file:
             json.dump(self.patterns, json_file, indent=4)
