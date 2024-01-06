@@ -1,2 +1,11 @@
 env/
+exceptional/
 __pycache__/
+gifs/*
+qrs/*
+patterns.json
+card_backgrounds/
+card_backs/
+card_fronts/
+fonts/
+font_template.png

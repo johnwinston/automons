@@ -2,11 +2,15 @@ import sys
 import numpy as np
 from subprocess import PIPE, Popen
 from random import randrange, sample
+import os
 
 class AUTO_NTZFIND:
     def __init__(self, iterations, period):
         self.golly_file_path =\
-            "/home/winston/devel/play/golly-4.2-src/Scripts/Python/ntzfind_patterns/"
+            "/home/winston/devel/play/golly/Scripts/Python/ntzfind_patterns/"
+        self.period_file_path = self.golly_file_path + str(period) + "/"
+        if not os.path.exists(self.period_file_path):
+            os.makedirs(self.period_file_path)
         self.iterations = iterations
         self.period = "p" + str(period)
         self.numbers = list(np.linspace(1,7,7,dtype=int))
@@ -58,8 +62,12 @@ class AUTO_NTZFIND:
                 del output[:]
                 break
             elif 'Spaceship found' in str(output[i]):
+                if end - start < 13 or end - start > 18:
+                    del output[:]
+                    break
+
                 with open(
-                    self.golly_file_path+"pattern"+str(iteration+1)+".lif",
+                    self.period_file_path+"pattern"+str(iteration+1)+".lif",
                     'w'
                     ) as file:
 

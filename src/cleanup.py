@@ -1,11 +1,16 @@
 import os
 
 class CLEANUP:
-    def __init__(self):
-        self.base_path = '/home/winston/devel/play/golly-4.2-src/Scripts/Python/'
-        self.rle_path = self.base_path + 'rles/'
-        self.pattern_path = self.base_path + 'ntzfind_patterns/'
-        self.gif_path = './gifs/'
+    def __init__(self,period):
+        self.base_path = '/home/winston/devel/play/golly/Scripts/Python/'
+        self.period = str(period)
+        self.rle_path = self.base_path + 'rles/' + str(self.period) + '/'
+        self.pattern_path = self.base_path + 'ntzfind_patterns/' + str(self.period) + '/'
+        if not os.path.exists(self.pattern_path):
+            os.makedirs(self.pattern_path)
+        if not os.path.exists(self.rle_path):
+            os.makedirs(self.rle_path)
+        self.gif_path = './gifs/'+str(self.period)+'/'
         self.patterns = {}
 
     def clear_files(self):
@@ -39,7 +44,7 @@ class CLEANUP:
 
     def import_patterns(self):
         import json
-        with open("./data/patterns.json") as f:
+        with open("./data/"+self.period+"/patterns.json") as f:
             self.patterns = json.load(f)
 
     def select_patterns(self):

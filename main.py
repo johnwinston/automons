@@ -5,20 +5,28 @@ from src.combine import COMBINE
 from submodules import lifelib
 
 def main():
+    period = 0
     user_input = input('Run auto-ntzfind? (y/n): ')
     if user_input.lower() == 'y':
-        print('Clearing golly files...')
-        CLEANUP().clear_files()
+        period = int(input('Period: '))
         iterations = int(input('Number of spaceships: '))
-        AUTO_NTZFIND(iterations, period=4).run()
+        print('Clearing golly files...')
+        CLEANUP(period).clear_files()
+        print('Searching for spaceships...')
+        AUTO_NTZFIND(iterations, period).run()
+        RLE2APGCODE(lifelib, period).run()
 
     user_input = input('Run rle2apgcode? (y/n): ')
     if user_input.lower() == 'y':
-        RLE2APGCODE(lifelib).run()
+        if period == 0:
+            period = int(input('Period: '))
+        RLE2APGCODE(lifelib, period).run()
 
     user_input = input('Run cleanup? (y/n): ')
     if user_input.lower() == 'y':
-        CLEANUP().select_patterns()
+        if period == 0:
+            period = int(input('Period: '))
+        CLEANUP(period).select_patterns()
 
     '''
     user_input = input('Combine cards? (y/n): ')

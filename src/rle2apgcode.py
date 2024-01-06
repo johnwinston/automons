@@ -12,8 +12,9 @@ def random_color():
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
 class RLE2APGCODE:
-    def __init__(self,lifelib):
-        self.rle_path = '/home/winston/devel/play/golly-4.2-src/Scripts/Python/rles'
+    def __init__(self,lifelib,period):
+        self.period = str(period)
+        self.rle_path = '/home/winston/devel/play/golly/Scripts/Python/rles/' + str(period)
         self.pythlib_path = './submodules/lifelib/pythlib/'
         self.catagolue_URL = 'https://catagolue.hatsya.com/object/'
         self.patterns = {}
@@ -41,9 +42,12 @@ class RLE2APGCODE:
         return pattern, apgcode, rule
 
     def make_gif_and_qr(self, pattern, apgcode, rule, url):
+        if not os.path.exists('./gifs/'+self.period):
+            os.makedirs('./gifs/'+self.period)
+
         gif = pattern.make_gif(
                 hue=random_color(),
-                filename='./gifs/'+apgcode+'.gif'
+                filename='./gifs/'+self.period+'/'+apgcode+'.gif'
                 )
 
         qr = qrcode.QRCode(
@@ -75,7 +79,11 @@ class RLE2APGCODE:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 rle = f.read()
 
-            pattern, apgcode, rule = self.extract_data(rle)
+            try:
+                pattern, apgcode, rule = self.extract_data(rle)
+            except Exception as e:
+                print(e)
+                continue
             if pattern is None:
                 continue
             self.patterns[filename]["rle"] = rle
@@ -86,7 +94,9 @@ class RLE2APGCODE:
             self.make_gif_and_qr(pattern, apgcode, rule, self.patterns[filename]["url"])
             self.cleanup_shared_objects()
 
-        with open('./data/patterns.json', 'w') as json_file:
+        if not os.path.exists('./data/' + self.period):
+            os.makedirs('./data/' + self.period)
+        with open('./data/' + self.period + '/patterns.json', 'w') as json_file:
             json.dump(self.patterns, json_file, indent=4)
 
         return self.patterns
