@@ -44,6 +44,8 @@ class RLE2APGCODE:
     def make_gif_and_qr(self, pattern, apgcode, rule, url):
         if not os.path.exists('./gifs/'+self.period):
             os.makedirs('./gifs/'+self.period)
+        if not os.path.exists('./qrs/'+self.period):
+            os.makedirs('./qrs/'+self.period)
 
         gif = pattern.make_gif(
                 hue=random_color(),
@@ -60,7 +62,7 @@ class RLE2APGCODE:
         qr.make(fit=True)
         img = qr.make_image()
         img = img.resize((450,450))
-        img.save('./qrs/' + apgcode + '.png')
+        img.save('./qrs/' + self.period + '/' + apgcode + '.png')
 
     def cleanup_shared_objects(self):
         for filename in os.listdir(self.pythlib_path):

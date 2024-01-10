@@ -1,9 +1,9 @@
 from PIL import Image, ImageDraw, ImageFont
 
 class COMBINE:
-    def __init__(self):
+    def __init__(self,period):
         self.patterns = {}
-        self.patterns_path = './data/patterns.json'
+        self.patterns_path = './data/' + str(period) + '/patterns.json'
 
         self.font_path = './fonts/FUTURE/future.ttf'
 
@@ -12,11 +12,21 @@ class COMBINE:
         self.front_path = './card_backgrounds/common.png'
         self.back_path = './card_backgrounds/back.png'
         
-        self.card_fronts_path = './card_fronts/'
-        self.card_backs_path = './card_backs/'
+        self.card_fronts_path = './card_fronts/' + str(period) + '/'
+        self.card_backs_path = './card_backs/' + str(period) + '/'
 
-        self.ships_path = './gifs/'
-        self.qrs_path = './qrs/'
+        self.ships_path = './gifs/' + str(period) + '/'
+        self.qrs_path = './qrs/' + str(period) + '/'
+        
+        import os
+        if not os.path.exists(self.card_fronts_path):
+            os.makedirs(self.card_fronts_path)
+        if not os.path.exists(self.card_backs_path):
+            os.makedirs(self.card_backs_path)
+        if not os.path.exists(self.ships_path):
+            os.makedirs(self.ships_path)
+        if not os.path.exists(self.qrs_path):
+            os.makedirs(self.qrs_path)
 
         self.gif_scale_factor_x = .465
         self.gif_scale_factor_y = .465
@@ -50,6 +60,7 @@ class COMBINE:
         self.merge_ships_with_card_front()
         self.merge_qr_codes_with_card_back()
         self.merge_card_front_with_template()
+        self.merge_card_back_with_template()
 
     def get_ships_from_gif_directory(self):
         import os
@@ -75,11 +86,55 @@ class COMBINE:
                 card_fronts.append(file)
         return card_fronts
 
+    def get_card_backs_from_card_backs_directory(self):
+        import os
+        card_backs = []
+        for file in os.listdir(self.card_backs_path):
+            if file.endswith(".png"):
+                card_backs.append(file)
+        return card_backs
+
+    def merge_card_back_with_template(self):
+        template_image = Image.open(self.template_path)
+        x_offset = 3300 - 150 - 750
+        y_offset = 375
+        i = 0
+        for card_back in self.get_card_backs_from_card_backs_directory():
+            if i % 4 == 0 and i != 0:
+                y_offset += 1087
+                x_offset = 3300 - 150 - 750
+            if i >= 16:
+                break
+            back_image = Image.open(self.card_backs_path + card_back)
+            # Crop the left and the right sides of the card back by 21 pixels
+            back_image = back_image.crop((21, 0, 279, 400))
+            # Remove 8 pixels from the right side of the card back
+            back_image = back_image.crop((0, 0, 249, 400))
+            # Remove 21 pixels from the top of the card back
+            back_image = back_image.crop((0, 21, 249, 400))
+            # Remove 21 pixels from the bottom of the card back
+            back_image = back_image.crop((0, 0, 249, 362))
+            width, height = back_image.size
+            width = width + 3
+            height = height + 1
+            back_image = back_image.resize((int(width * 3), int(height * 3)))
+            template_image.paste(back_image, (x_offset, y_offset), back_image)
+            x_offset -= 750
+            i = i + 1
+
+        template_image.save('./back_template.png')
+
     def merge_card_front_with_template(self):
         template_image = Image.open(self.template_path)
-        x_offset = 70
-        y_offset = 25
+        x_offset = 150
+        y_offset = 375
+        i = 0
         for card_front in self.get_card_fronts_from_card_fronts_directory():
+            if i % 4 == 0 and i != 0:
+                y_offset += 1087
+                x_offset = 150
+            if i >= 16:
+                break
             front_image = Image.open(self.card_fronts_path + card_front)
             # Crop the left and the right sides of the card front by 21 pixels
             front_image = front_image.crop((21, 0, 279, 400))
@@ -89,12 +144,13 @@ class COMBINE:
             front_image = front_image.crop((0, 21, 249, 400))
             # Remove 21 pixels from the bottom of the card front
             front_image = front_image.crop((0, 0, 249, 362))
-
-            # Rotate the card front 90 degrees
-            front_image = front_image.rotate(90, expand=True)
-
+            width, height = front_image.size
+            width = width + 3
+            height = height + 1
+            front_image = front_image.resize((int(width * 3), int(height * 3)))
             template_image.paste(front_image, (x_offset, y_offset), front_image)
-            x_offset += 400
+            x_offset += 750
+            i = i + 1
 
         template_image.save('./front_template.png')
 
@@ -111,7 +167,7 @@ class COMBINE:
             qr_code_image = qr_code_image.convert('RGBA')
             back_image.paste(qr_code_image, self.qr_position, qr_code_image)
 
-            back_image.save('./card_backs/'+qr_code[:-4]+'.png')
+            back_image.save(self.card_backs_path+qr_code[:-4]+'.png')
 
     def merge_ships_with_card_front(self):
         from unique_names_generator import get_random_name
@@ -142,6 +198,6 @@ class COMBINE:
                     font=font,
                     fill=self.text_color)
 
-            front_image.save('./card_fronts/'+ship[:-4]+'.png')
+            front_image.save(self.card_fronts_path + ship[:-4] + '.png')
 
 

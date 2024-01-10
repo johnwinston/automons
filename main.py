@@ -28,11 +28,11 @@ def main():
             period = int(input('Period: '))
         CLEANUP(period).select_patterns()
 
-    '''
     user_input = input('Combine cards? (y/n): ')
     if user_input.lower() == 'y':
-        COMBINE().run()
-    '''
+        if period == 0:
+            period = int(input('Period: '))
+        COMBINE(period).run()
 
 if __name__ == '__main__':
     main()
