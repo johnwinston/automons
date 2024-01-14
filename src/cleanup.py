@@ -95,6 +95,8 @@ class CLEANUP:
         # and ask the user if they want to keep it
         image_directory = self.gif_path
         image_paths = glob.glob(os.path.join(image_directory, '*.gif'))
+        import random
+        random.shuffle(image_paths)
         images_iter = iter(image_paths)
 
         keep_button = tk.Button(

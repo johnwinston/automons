@@ -1,15 +1,61 @@
 from PIL import Image, ImageDraw, ImageFont
+import os
 
 class COMBINE:
     def __init__(self,period):
+        self.period = period
         self.patterns = {}
         self.patterns_path = './data/' + str(period) + '/patterns.json'
 
         self.font_path = './fonts/FUTURE/future.ttf'
 
         self.template_path = './card_backgrounds/template.png'
+        self.common_path = './card_backgrounds/common/'
+        self.uncommon_path = './card_backgrounds/uncommon/'
+        self.rare_path = './card_backgrounds/rare/'
+        self.legendary_path = './card_backgrounds/legendary/'
+        
+        self.common_text = "a common\nspaceship"
+        self.uncommon_text = "an uncommon\n    spaceship"
+        self.rare_text = "   a rare\nspaceship"
+        self.legendary_text = "a legendary\n   spaceship"
+        self.golden_text = " the golden\n      glider"
+        self.golden_front_path = './card_backgrounds/golden.png'
 
-        self.front_path = './card_backgrounds/common.png'
+        if not os.path.exists(self.common_path):
+            os.makedirs(self.common_path)
+        if not os.path.exists(self.uncommon_path):
+            os.makedirs(self.uncommon_path)
+        if not os.path.exists(self.rare_path):
+            os.makedirs(self.rare_path)
+        if not os.path.exists(self.legendary_path):
+            os.makedirs(self.legendary_path)
+
+        if period == '4':
+            self.rarity_path = self.common_path + 'common_'
+            self.text = self.common_text
+            self.front_path = './card_backgrounds/common.png'
+            self.desc_position = (285, 915)
+            self.desc_font_size = 48
+        elif period == '5':
+            self.rarity_path = self.uncommon_path + 'uncommon_'
+            self.text = self.uncommon_text
+            self.front_path = './card_backgrounds/uncommon.png'
+            self.desc_position = (240, 915)
+            self.desc_font_size = 48
+        elif period == '6':
+            self.rarity_path = self.rare_path + 'rare_'
+            self.text = self.rare_text
+            self.front_path = './card_backgrounds/rare.png'
+            self.desc_position = (285, 915)
+            self.desc_font_size = 48
+        else:
+            self.rarity_path = self.legendary_path + 'legendary_'
+            self.text = self.legendary_text
+            self.front_path = './card_backgrounds/legendary.png'
+            self.desc_position = (245, 915)
+            self.desc_font_size = 48
+        
         self.back_path = './card_backgrounds/back.png'
         
         self.card_fronts_path = './card_fronts/' + str(period) + '/'
@@ -18,7 +64,6 @@ class COMBINE:
         self.ships_path = './gifs/' + str(period) + '/'
         self.qrs_path = './qrs/' + str(period) + '/'
         
-        import os
         if not os.path.exists(self.card_fronts_path):
             os.makedirs(self.card_fronts_path)
         if not os.path.exists(self.card_backs_path):
@@ -28,17 +73,15 @@ class COMBINE:
         if not os.path.exists(self.qrs_path):
             os.makedirs(self.qrs_path)
 
-        self.gif_scale_factor_x = .465
-        self.gif_scale_factor_y = .465
+        self.gif_scale_factor_x = 1.39
+        self.gif_scale_factor_y = 1.39
         self.qr_scale_factor_x = .36
         self.qr_scale_factor_y = .36
 
-        self.name_font_size = 20
-        self.desc_font_size = 18
-        self.name_position = (63, 64)
-        self.desc_position = (90, 302)
+        self.name_font_size = 55
+        self.name_position = (185, 194)
 
-        self.ship_position = (65, 114)
+        self.ship_position = (195, 344)
         self.qr_position = (66, 141)
 
         self.name_center_position = (145, 75)
@@ -99,12 +142,16 @@ class COMBINE:
         x_offset = 3300 - 150 - 750
         y_offset = 375
         i = 0
+        page = 1
         for card_back in self.get_card_backs_from_card_backs_directory():
             if i % 4 == 0 and i != 0:
                 y_offset += 1087
                 x_offset = 3300 - 150 - 750
-            if i >= 16:
-                break
+            if i % 16 == 0 and i != 0:
+                template_image.save(self.rarity_path + 'back_' + str(page) + '.png')
+                page = page + 1
+                template_image = Image.open(self.template_path)
+                y_offset = 375
             back_image = Image.open(self.card_backs_path + card_back)
             # Crop the left and the right sides of the card back by 21 pixels
             back_image = back_image.crop((21, 0, 279, 400))
@@ -122,37 +169,39 @@ class COMBINE:
             x_offset -= 750
             i = i + 1
 
-        template_image.save('./back_template.png')
+        template_image.save(self.rarity_path + 'back_' + str(page) + '.png')
+
 
     def merge_card_front_with_template(self):
         template_image = Image.open(self.template_path)
         x_offset = 150
         y_offset = 375
         i = 0
+        page = 1
         for card_front in self.get_card_fronts_from_card_fronts_directory():
             if i % 4 == 0 and i != 0:
                 y_offset += 1087
                 x_offset = 150
-            if i >= 16:
-                break
+            if i % 16 == 0 and i != 0:
+                template_image.save(self.rarity_path + 'front_' + str(page) + '.png')
+                page = page + 1
+                template_image = Image.open(self.template_path)
+                y_offset = 375
             front_image = Image.open(self.card_fronts_path + card_front)
-            # Crop the left and the right sides of the card front by 21 pixels
-            front_image = front_image.crop((21, 0, 279, 400))
-            # Remove 8 pixels from the right side of the card front
-            front_image = front_image.crop((0, 0, 249, 400))
-            # Remove 21 pixels from the top of the card front
-            front_image = front_image.crop((0, 21, 249, 400))
-            # Remove 21 pixels from the bottom of the card front
-            front_image = front_image.crop((0, 0, 249, 362))
             width, height = front_image.size
-            width = width + 3
-            height = height + 1
-            front_image = front_image.resize((int(width * 3), int(height * 3)))
+            # Crop all sides of the card front by 63 pixels
+            width = width - 63
+            height = height - 63
+            front_image = front_image.crop((63, 63, width, height))
+
+            template_width = 750
+            template_height = 1088
+            front_image = front_image.resize((int(template_width), int(template_height)))
             template_image.paste(front_image, (x_offset, y_offset), front_image)
             x_offset += 750
             i = i + 1
 
-        template_image.save('./front_template.png')
+        template_image.save(self.rarity_path + 'front_' + str(page) + '.png')
 
     def merge_qr_codes_with_card_back(self):
         for qr_code in self.get_qr_codes_from_qr_directory():
@@ -173,7 +222,10 @@ class COMBINE:
         from unique_names_generator import get_random_name
 
         for ship in self.get_ships_from_gif_directory():
-            front_image = Image.open(self.front_path)
+            if ship == 'glider.gif':
+                front_image = Image.open(self.golden_front_path)
+            else:
+                front_image = Image.open(self.front_path)
             ship_image = Image.open(self.ships_path + ship)
 
             width, height = ship_image.size
@@ -186,17 +238,27 @@ class COMBINE:
 
             draw = ImageDraw.Draw(front_image)
             font = ImageFont.truetype(self.font_path, self.name_font_size)
-            name = get_random_name()
-            while (len(name) >= 12):
+            if self.period == "life":
+                name = ship[:-4]
+                name = name.replace("_", " ")
+            else:
                 name = get_random_name()
+                while (len(name) >= 11):
+                    name = get_random_name()
             draw.text(self.name_position, name, font=font, fill=self.text_color)
 
             draw = ImageDraw.Draw(front_image)
             font = ImageFont.truetype(self.font_path, self.desc_font_size)
-            draw.text(self.desc_position,
-                    "a common\nspaceship",
+            if ship == 'glider.gif':
+                draw.text(self.desc_position,
+                    self.golden_text,
                     font=font,
                     fill=self.text_color)
+            else:
+                draw.text(self.desc_position,
+                        self.text,
+                        font=font,
+                        fill=self.text_color)
 
             front_image.save(self.card_fronts_path + ship[:-4] + '.png')
 

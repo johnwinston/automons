@@ -19,19 +19,19 @@ def main():
     user_input = input('Run rle2apgcode? (y/n): ')
     if user_input.lower() == 'y':
         if period == 0:
-            period = int(input('Period: '))
+            period = input('Period: ')
         RLE2APGCODE(lifelib, period).run()
 
     user_input = input('Run cleanup? (y/n): ')
     if user_input.lower() == 'y':
         if period == 0:
-            period = int(input('Period: '))
+            period = input('Period: ')
         CLEANUP(period).select_patterns()
 
     user_input = input('Combine cards? (y/n): ')
     if user_input.lower() == 'y':
         if period == 0:
-            period = int(input('Period: '))
+            period = input('Period: ')
         COMBINE(period).run()
 
 if __name__ == '__main__':

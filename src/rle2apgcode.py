@@ -13,12 +13,17 @@ def random_color():
 
 class RLE2APGCODE:
     def __init__(self,lifelib,period):
-        self.period = str(period)
+        self.period = period
         self.rle_path = '/home/winston/devel/play/golly/Scripts/Python/rles/' + str(period)
+        self.life_rle_path = './legendary/'
         self.pythlib_path = './submodules/lifelib/pythlib/'
         self.catagolue_URL = 'https://catagolue.hatsya.com/object/'
         self.patterns = {}
         self.lifelib=lifelib
+        self.rule = ''
+        self.lt = None
+        if period == 'life':
+            self.rle_path = self.life_rle_path
 
     def return_node(self):
         return {
@@ -32,25 +37,33 @@ class RLE2APGCODE:
         try:
             match = re.search(r'rule = ([^ \n]+)', rle)
             rule = match.group(1).lower().replace('/','')
+            if rule != self.rule:
+                self.lt = self.lifelib.load_rules(rule).lifetree(n_layers=1)
+                self.rule = rule
 
-            lt = self.lifelib.load_rules(rule).lifetree(n_layers=1)
-            pattern = lt.pattern(rle)
+            pattern = self.lt.pattern(rle)
             apgcode = pattern.apgcode
         except Exception as e:
             print(e)
             return None
         return pattern, apgcode, rule
 
-    def make_gif_and_qr(self, pattern, apgcode, rule, url):
+    def make_gif_and_qr(self, pattern, apgcode, rule, url, filename):
         if not os.path.exists('./gifs/'+self.period):
             os.makedirs('./gifs/'+self.period)
         if not os.path.exists('./qrs/'+self.period):
             os.makedirs('./qrs/'+self.period)
 
-        gif = pattern.make_gif(
+        if self.period == 'life':
+            gif = pattern.make_gif(
                 hue=random_color(),
-                filename='./gifs/'+self.period+'/'+apgcode+'.gif'
+                filename='./gifs/'+self.period+'/'+filename+'.gif'
                 )
+        else:
+            gif = pattern.make_gif(
+                    hue=random_color(),
+                    filename='./gifs/'+self.period+'/'+apgcode+'.gif'
+                    )
 
         qr = qrcode.QRCode(
             version=1,
@@ -62,7 +75,10 @@ class RLE2APGCODE:
         qr.make(fit=True)
         img = qr.make_image()
         img = img.resize((450,450))
-        img.save('./qrs/' + self.period + '/' + apgcode + '.png')
+        if self.period == 'life':
+            img.save('./qrs/' + self.period + '/' + filename + '.png')
+        else:
+            img.save('./qrs/' + self.period + '/' + apgcode + '.png')
 
     def cleanup_shared_objects(self):
         for filename in os.listdir(self.pythlib_path):
@@ -93,7 +109,7 @@ class RLE2APGCODE:
             self.patterns[filename]["apgcode"] = apgcode
             self.patterns[filename]["url"] = self.catagolue_URL + apgcode + '/' + rule
 
-            self.make_gif_and_qr(pattern, apgcode, rule, self.patterns[filename]["url"])
+            self.make_gif_and_qr(pattern, apgcode, rule, self.patterns[filename]["url"], filename[:-4])
             self.cleanup_shared_objects()
 
         if not os.path.exists('./data/' + self.period):
